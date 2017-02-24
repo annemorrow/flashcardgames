@@ -19,6 +19,9 @@ with sqlite3.connect(DATABASE_PATH) as connection:
     c.execute("""CREATE TABLE questions(question_id INTEGER PRIMARY KEY AUTOINCREMENT,
              list_id INTEGER NOT NULL, question TEXT NOT NULL, answer TEXT)""")
     
+    # temporary "real" user
+    c.execute("""INSERT INTO users (username) VALUES("admin")""")
+    
     # insert dummy users into the tables
     c.execute("""INSERT INTO users (username) VALUES("testuser1")""")
     c.execute("""INSERT INTO users (username) VALUES("testuser2")""")
