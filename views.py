@@ -30,6 +30,29 @@ def login_required(test):
             return redirect(url_for('login'))
     return wrap
 
+def get_list_names(username):
+    g.db = connect_db()
+    cur = g.db.execute('''select list_name from users inner join lists on 
+                users.user_id=lists.user_id where username is "{}"'''.format(username))
+    list_names = [str(row[0]) for row in cur.fetchall()]
+    g.db.close()
+    return list_names
+
+def get_questions(username, list_name):
+    g.db = connect_db()
+    cur = g.db.execute('''select question, answer from 
+              users inner join lists on users.user_id=lists.user_id 
+              inner join questions on lists.list_id=questions.list_id
+              where username="{}" and list_name="{}"'''.format(username, list_name))
+    q = []
+    for row in cur:
+        item = {}
+        item["question"] = str(row[0])
+        item["answer"] = str(row[1])
+        q.append(item)
+    g.db.close()
+    return q
+
 # route handlers
 
 @app.route('/logout/')
@@ -54,24 +77,12 @@ def login():
 @app.route('/questions/')
 @login_required
 def questions():
-    g.db = connect_db()
-    cur = g.db.execute(
-        '''select list_name from lists where user_id is 
-        (select user_id from users where username is "admin")'''
-    )
-    question_lists = [
-        row[0] for row in cur.fetchall()
-    ]
-    cur = g.db.execute(
-        ''' select list_id, question, answer from questions'''
-    )
-    questions = [[row[0], str(row[1]), str(row[2])] for row in cur.fetchall()]
-    for question in questions:
-        cur = g.db.execute('select list_name from lists where list_id is ' + str(question[0]))
-        question[0] = str(cur.fetchall()[0][0])
-    g.db.close()
+    question_lists = get_list_names("admin")
+    full_question_set = {}
+    for list_name in question_lists:
+        full_question_set[list_name] = get_questions("admin", list_name)
     return render_template(
         'questions.html',
         question_lists=question_lists,
-        questions=questions
+        full_question_set=full_question_set
     )

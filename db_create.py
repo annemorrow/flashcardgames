@@ -11,7 +11,7 @@ with sqlite3.connect(DATABASE_PATH) as connection:
     
     # create the tables
     c.execute("""CREATE TABLE users(user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-              username TEXT NOT NULL)""")
+              username TEXT NOT NULL UNIQUE)""")
     
     c.execute("""CREATE TABLE lists(list_id INTEGER PRIMARY KEY AUTOINCREMENT,
               user_id INTEGER NOT NULL, list_name TEXT NOT NULL)""")
@@ -40,3 +40,7 @@ with sqlite3.connect(DATABASE_PATH) as connection:
     c.execute("""insert into questions(list_id, question, answer) values(2, "3 x 4", "12")""")
     c.execute("""insert into questions(list_id, question, answer) values(2, "3 x 8", "24")""")
     c.execute("""insert into questions(list_id, question, answer) values(2, "3 x 15", "45")""")
+    
+    c.execute("""insert into questions (question, answer, list_id) 
+              values("When was the American Declaration of Independance signed?", 
+              "July 4, 1776", (select list_id from lists where list_name is "history"))""")

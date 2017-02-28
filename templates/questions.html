@@ -7,10 +7,15 @@
     {% endfor %}
 </ul>
 
-<ul>
-    {% for q in questions %}
-        <li>Subject: {{ q[0] }}, Question: {{ q[1] }}, Answer: {{ q[2] }}
+
+{% for list_name in full_question_set %}
+    <h2> {{list_name }} </h2>
+    <ul>
+    {% for q in full_question_set[list_name] %}
+        <li> {{ q["question"] }}: {{ q["answer"] }} </li>
     {% endfor %}
-</ul>
+    </ul>
+{% endfor %}
+
 
 {% endblock %}
