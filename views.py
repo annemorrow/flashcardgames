@@ -83,6 +83,25 @@ def questions():
         full_question_set[list_name] = get_questions("admin", list_name)
     return render_template(
         'questions.html',
-        question_lists=question_lists,
         full_question_set=full_question_set
     )
+
+# Add new list
+@app.route('/add_list/', methods=['POST'])
+@login_required
+def new_list():
+    g.db = connect_db()
+    cur = g.db.execute('select user_id from users where username is "admin"')
+    user_id = 0
+    for row in cur:
+        user_id = str(row[0])
+    list_name = request.form['list_name']
+    if not list_name:
+        flash("Your list needs a name")
+        return redirect(url_for('questions'))
+    else:
+        g.db.execute('insert into lists (user_id, list_name) values (?, ?)', [user_id, request.form['list_name']])
+        g.db.commit()
+        g.db.close()
+        flash('New list was successfully added.  Thanks.')
+        return redirect(url_for('questions'))
