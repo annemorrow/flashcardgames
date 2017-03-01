@@ -100,8 +100,36 @@ def new_list():
         flash("Your list needs a name")
         return redirect(url_for('questions'))
     else:
-        g.db.execute('insert into lists (user_id, list_name) values (?, ?)', [user_id, request.form['list_name']])
+        g.db.execute('insert into lists (user_id, list_name) values (?, ?)', [user_id, list_name])
         g.db.commit()
         g.db.close()
         flash('New list was successfully added.  Thanks.')
         return redirect(url_for('questions'))
+
+# Add new question
+@app.route('/add_question/', methods=['POST'])
+@login_required
+def new_question():
+    g.db = connect_db()
+    cur = g.db.execute('select user_id from users where username is "admin"')
+    user_id = 0
+    for row in cur:
+        user_id = str(row[0])
+    list_name = request.form['list_name']
+    question = request.form['question']
+    answer = request.form['answer']
+    if not list_name or not question or not answer:
+        flash("All fields are required.  Please try again.")
+        return redirect(url_for('questions'))
+    else:
+        list_id = 0
+        cur = g.db.execute('''select list_id from lists where user_id is {} 
+                        and list_name is "{}"'''.format(user_id, list_name))
+        for row in cur:
+            list_id = str(row[0])
+        g.db.execute('insert into questions (list_id, question, answer) values (?, ?, ?)', [
+        list_id, question, answer])
+    g.db.commit()
+    g.db.close()
+    flash('New question was successfully added.  Thanks.')
+    return redirect(url_for('questions'))
