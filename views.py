@@ -52,7 +52,7 @@ def get_user_questions(user_id):
               users.user_id=lists.user_id where users.user_id is "{}"'''.format(user_id))
     for row in cur:
         item = {}
-        item["list_id"] = str(row[0])
+        item["list_id"] = row[0]
         item["list_name"] = str(row[1])
         user_questions.append(item)
     for item in user_questions:
@@ -61,7 +61,7 @@ def get_user_questions(user_id):
                           where list_id is "{}"'''.format(item["list_id"]))
         for row in cur:
             question = {}
-            question["question_id"] = str(row[0])
+            question["question_id"] = row[0]
             question["question"] = str(row[1])
             question["answer"] = str(row[2])
             question_list.append(question)
@@ -131,4 +131,15 @@ def new_question():
     g.db.execute('insert into questions (list_id, question, answer) values (?, ?, ?)', [list_id, question, answer])
     g.db.commit()
     g.db.close()
+    return redirect(url_for('questions'))
+
+# Delete question
+@app.route('/delete/<int:question_id>/')
+@login_required
+def delete_question(question_id):
+    g.db = connect_db()
+    g.db.execute('delete from questions where question_id='+str(question_id))
+    g.db.commit()
+    g.db.close()
+    flash('The question was deleted')
     return redirect(url_for('questions'))

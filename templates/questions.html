@@ -25,7 +25,7 @@
     <h2> {{ list_object["list_name"] }} </h2>
     <ul>
     {% for q in list_object["questions"] %}
-        <li> {{ q["question"] }}: {{ q["answer"] }} </li>
+        <li> {{ q["question"] }}: {{ q["answer"] }} <a href="{{ url_for('delete_question', question_id=q['question_id']) }}">Delete</a> </li>
     {% endfor %}
     </ul>
 {% endfor %}
