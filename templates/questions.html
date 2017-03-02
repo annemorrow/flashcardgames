@@ -1,3 +1,5 @@
+<!-- full_question_set = [{list_id:, list_name: , questions: [{question_id: question: answer:}, ]}, {list_id:, list_name: , questions: []}] -->
+
 {% extends "_base.html" %}
 {% block content %}
 
@@ -9,8 +11,8 @@
 <form action = "{{ url_for('new_question') }}" method="post">
     <label>List Name:<label>
     <select name="list_name" width="100px">
-        {% for list_name in full_question_set %}
-            <option value="{{ list_name }}">{{ list_name }}</option>
+        {% for list_object in full_question_set %}
+            <option value="{{ list_object['list_name'] }}">{{ list_object['list_name'] }}</option>
         {% endfor %}
     </select>
     <label>Question:</label>
@@ -19,10 +21,10 @@
     <input name="answer" type="text">
     <input class="button" type="submit" value="Save">
     
-{% for list_name in full_question_set %}
-    <h2> {{list_name }} </h2>
+{% for list_object in full_question_set %}
+    <h2> {{ list_object["list_name"] }} </h2>
     <ul>
-    {% for q in full_question_set[list_name] %}
+    {% for q in list_object["questions"] %}
         <li> {{ q["question"] }}: {{ q["answer"] }} </li>
     {% endfor %}
     </ul>

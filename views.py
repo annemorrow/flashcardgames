@@ -30,28 +30,45 @@ def login_required(test):
             return redirect(url_for('login'))
     return wrap
 
-def get_list_names(username):
+def get_questions(list_id):
     g.db = connect_db()
-    cur = g.db.execute('''select list_name from users inner join lists on 
-                users.user_id=lists.user_id where username is "{}"'''.format(username))
-    list_names = [str(row[0]) for row in cur.fetchall()]
-    g.db.close()
-    return list_names
-
-def get_questions(username, list_name):
-    g.db = connect_db()
-    cur = g.db.execute('''select question, answer from 
-              users inner join lists on users.user_id=lists.user_id 
-              inner join questions on lists.list_id=questions.list_id
-              where username="{}" and list_name="{}"'''.format(username, list_name))
+    cur = g.db.execute('''select question_id, question, answer from questions where
+                         list_id is "{}"'''.format(list_id))
     q = []
     for row in cur:
         item = {}
-        item["question"] = str(row[0])
-        item["answer"] = str(row[1])
+        item["question_id"] = str(row[0])
+        item["question"] = str(row[1])
+        item["answer"] = str(row[2])
         q.append(item)
     g.db.close()
     return q
+
+def get_user_questions(user_id):
+    # [{list_id:, list_name: , questions: [{question_id: question: answer:}, ]}, {list_id:, list_name: , questions: []}]
+    g.db = connect_db()
+    user_questions = []
+    cur = g.db.execute('''select list_id, list_name from lists inner join users on
+              users.user_id=lists.user_id where users.user_id is "{}"'''.format(user_id))
+    for row in cur:
+        item = {}
+        item["list_id"] = str(row[0])
+        item["list_name"] = str(row[1])
+        user_questions.append(item)
+    for item in user_questions:
+        question_list = []
+        cur = g.db.execute('''select question_id, question, answer from questions 
+                          where list_id is "{}"'''.format(item["list_id"]))
+        for row in cur:
+            question = {}
+            question["question_id"] = str(row[0])
+            question["question"] = str(row[1])
+            question["answer"] = str(row[2])
+            question_list.append(question)
+        item["questions"] = question_list
+    g.db.close()
+    return user_questions
+        
 
 # route handlers
 
@@ -77,10 +94,7 @@ def login():
 @app.route('/questions/')
 @login_required
 def questions():
-    question_lists = get_list_names("admin")
-    full_question_set = {}
-    for list_name in question_lists:
-        full_question_set[list_name] = get_questions("admin", list_name)
+    full_question_set = get_user_questions(1)
     return render_template(
         'questions.html',
         full_question_set=full_question_set
