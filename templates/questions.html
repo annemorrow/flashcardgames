@@ -10,9 +10,9 @@
 
 <form action = "{{ url_for('new_question') }}" method="post">
     <label>List Name:<label>
-    <select name="list_name" width="100px">
+    <select name="list_id" width="100px">
         {% for list_object in full_question_set %}
-            <option value="{{ list_object['list_name'] }}">{{ list_object['list_name'] }}</option>
+            <option value="{{ list_object['list_id'] }}">{{ list_object['list_name'] }}</option>
         {% endfor %}
     </select>
     <label>Question:</label>
