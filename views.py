@@ -1,24 +1,23 @@
 # views.py
 
 
-import sqlite3
-from functools import wraps
 
+from functools import wraps
 from flask import Flask, flash, redirect, render_template, \
-    request, session, url_for, g
+    request, session, url_for
+from flask.ext.sqlalchemy import SQLAlchemy
     
 
 # config
 
 app = Flask(__name__)
 app.config.from_object('_config')
+db = SQLAlchemy(app)
+
+from models import Subject
 
 
 # helper functions
-
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE_PATH'])
-
 
 def login_required(test):
     @wraps(test)
@@ -29,46 +28,6 @@ def login_required(test):
             flash('You need to login first.')
             return redirect(url_for('login'))
     return wrap
-
-def get_questions(list_id):
-    g.db = connect_db()
-    cur = g.db.execute('''select question_id, question, answer from questions where
-                         list_id is "{}"'''.format(list_id))
-    q = []
-    for row in cur:
-        item = {}
-        item["question_id"] = str(row[0])
-        item["question"] = str(row[1])
-        item["answer"] = str(row[2])
-        q.append(item)
-    g.db.close()
-    return q
-
-def get_user_questions(user_id):
-    # [{list_id:, list_name: , questions: [{question_id: question: answer:}, ]}, {list_id:, list_name: , questions: []}]
-    g.db = connect_db()
-    user_questions = []
-    cur = g.db.execute('''select list_id, list_name from lists inner join users on
-              users.user_id=lists.user_id where users.user_id is "{}"'''.format(user_id))
-    for row in cur:
-        item = {}
-        item["list_id"] = row[0]
-        item["list_name"] = str(row[1])
-        user_questions.append(item)
-    for item in user_questions:
-        question_list = []
-        cur = g.db.execute('''select question_id, question, answer from questions 
-                          where list_id is "{}"'''.format(item["list_id"]))
-        for row in cur:
-            question = {}
-            question["question_id"] = row[0]
-            question["question"] = str(row[1])
-            question["answer"] = str(row[2])
-            question_list.append(question)
-        item["questions"] = question_list
-    g.db.close()
-    return user_questions
-        
 
 # route handlers
 
@@ -94,10 +53,10 @@ def login():
 @app.route('/questions/')
 @login_required
 def questions():
-    full_question_set = get_user_questions(1)
+    subjects = db.session.query(Subject)
     return render_template(
         'questions.html',
-        full_question_set=full_question_set
+        subjects = subjects
     )
 
 # Add new list
