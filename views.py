@@ -92,5 +92,6 @@ def new_question():
 @login_required
 def delete_question(question_id):
     db.session.query(Short_Answer_Question).filter_by(id = question_id).delete()
+    db.session.commit()
     flash('The question was deleted')
     return redirect(url_for('questions'))
