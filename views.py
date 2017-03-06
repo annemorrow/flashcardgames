@@ -91,9 +91,6 @@ def new_question():
 @app.route('/delete/<int:question_id>/')
 @login_required
 def delete_question(question_id):
-    g.db = connect_db()
-    g.db.execute('delete from questions where question_id='+str(question_id))
-    g.db.commit()
-    g.db.close()
+    db.session.query(Short_Answer_Question).filter_by(id = question_id).delete()
     flash('The question was deleted')
     return redirect(url_for('questions'))
