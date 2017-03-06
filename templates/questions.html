@@ -1,9 +1,32 @@
-
 {% extends "_base.html" %}
 {% block content %}
 
+<form action = "{{ url_for('new_subject') }}" method="post">
+    <label>List Name:</label>
+    <input name="list_name" type="text">
+</form>
+
+<form action = "{{ url_for('new_question') }}" method="post">
+    <label>List Name:<label>
+    <select name="subject_id" width="100px">
+        {% for subject in subjects %}
+            <option value="{{ subject.id }}">{{ subject.name }}</option>
+        {% endfor %}
+    </select>
+    <label>Question:</label>
+    <input name="question" type="text">
+    <label>Answer:</label>
+    <input name="answer" type="text">
+    <input class="button" type="submit" value="Save">
+    
 {% for subject in subjects %}
-    {{ subject.name }}
+    <h3>{{ subject.name }}</h3>
+    <ul>
+        {% for question in subject.short_answer_questions %}
+            <li>{{ question.question }}</li>
+        {% endfor %}
+    </ul>
 {% endfor %}
+
 
 {% endblock %}

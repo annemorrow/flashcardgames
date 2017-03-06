@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config.from_object('_config')
 db = SQLAlchemy(app)
 
-from models import Subject
+from models import Subject, Short_Answer_Question
 
 
 # helper functions
@@ -54,42 +54,37 @@ def login():
 @login_required
 def questions():
     subjects = db.session.query(Subject)
+    short_answer_questions = db.session.query(Short_Answer_Question)
     return render_template(
         'questions.html',
-        subjects = subjects
+        subjects = subjects,
+        short_answer_questions = short_answer_questions
     )
 
 # Add new list
-@app.route('/add_list/', methods=['POST'])
+@app.route('/add_subject/', methods=['POST'])
 @login_required
-def new_list():
-    g.db = connect_db()
-    cur = g.db.execute('select user_id from users where username is "admin"')
-    user_id = 0
-    for row in cur:
-        user_id = str(row[0])
+def new_subject():
     list_name = request.form['list_name']
     if not list_name:
         flash("Your list needs a name")
         return redirect(url_for('questions'))
     else:
-        g.db.execute('insert into lists (user_id, list_name) values (?, ?)', [user_id, list_name])
-        g.db.commit()
-        g.db.close()
-        flash('New list was successfully added.  Thanks.')
+        db.session.add(Subject(list_name))
+        db.session.commit()
+        flash('New subject was successfully added.  Thanks.')
         return redirect(url_for('questions'))
 
 # Add new question
 @app.route('/add_question/', methods=['POST'])
 @login_required
 def new_question():
-    g.db = connect_db()
-    list_id = request.form["list_id"]
+    subject_id = request.form["subject_id"]
     question = request.form["question"]
     answer = request.form["answer"]
-    g.db.execute('insert into questions (list_id, question, answer) values (?, ?, ?)', [list_id, question, answer])
-    g.db.commit()
-    g.db.close()
+    subject = db.session.query(Subject).filter_by(id=subject_id)[0]
+    db.session.add(Short_Answer_Question(subject, question, answer))
+    db.session.commit()
     return redirect(url_for('questions'))
 
 # Delete question
