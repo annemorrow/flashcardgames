@@ -15,7 +15,7 @@ app.config.from_object('_config')
 db = SQLAlchemy(app)
 
 from models import Subject, Short_Answer_Question
-
+from forms import AddSubjectForm
 
 # helper functions
 
@@ -55,25 +55,28 @@ def login():
 def questions():
     subjects = db.session.query(Subject)
     short_answer_questions = db.session.query(Short_Answer_Question)
+    form = AddSubjectForm()
     return render_template(
         'questions.html',
         subjects = subjects,
-        short_answer_questions = short_answer_questions
+        short_answer_questions = short_answer_questions,
+        form=form
     )
 
 # Add new list
 @app.route('/add_subject/', methods=['POST'])
 @login_required
 def new_subject():
-    list_name = request.form['list_name']
-    if not list_name:
-        flash("Your list needs a name")
-        return redirect(url_for('questions'))
-    else:
-        db.session.add(Subject(list_name))
+    form = AddSubjectForm()
+    flash("new subject function")
+    if form.validate_on_submit():
+        subject_name = form.name.data
+        db.session.add(Subject(subject_name))
         db.session.commit()
         flash('New subject was successfully added.  Thanks.')
-        return redirect(url_for('questions'))
+    else:
+        flash(form.errors)
+    return redirect(url_for('questions'))
 
 # Add new question
 @app.route('/add_question/', methods=['POST'])
