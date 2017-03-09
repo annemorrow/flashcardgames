@@ -3,12 +3,12 @@
 
 
 <form action = "{{ url_for('new_subject') }}" method="POST">
-    {{ form.csrf_token }}
-    {{ form.name.label }} {{ form.name(size=20) }}
+    {{ form1.csrf_token }}
+    {{ form1.name.label }} {{ form1.name(size=20) }}
     <input class="button" type="submit" value="Go">
 </form>
 
-<!--
+
 <form action = "{{ url_for('new_question') }}" method="post">
     <label>List Name:<label>
     <select name="subject_id" width="100px">
@@ -21,7 +21,6 @@
     <label>Answer:</label>
     <input name="answer" type="text">
     <input class="button" type="submit" value="Save">
--->
     
 {% for subject in subjects %}
     <h3>{{ subject.name }}</h3>

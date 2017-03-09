@@ -55,12 +55,12 @@ def login():
 def questions():
     subjects = db.session.query(Subject)
     short_answer_questions = db.session.query(Short_Answer_Question)
-    form = AddSubjectForm()
+    form1 = AddSubjectForm()
     return render_template(
         'questions.html',
         subjects = subjects,
         short_answer_questions = short_answer_questions,
-        form=form
+        form1=form1
     )
 
 # Add new list
@@ -68,7 +68,6 @@ def questions():
 @login_required
 def new_subject():
     form = AddSubjectForm()
-    flash("new subject function")
     if form.validate_on_submit():
         subject_name = form.name.data
         db.session.add(Subject(subject_name))
