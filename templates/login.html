@@ -4,7 +4,7 @@
 <h1>Welcome to FlashCard Games</h1>
 <h3>Please login to access your questions and games.</h3>
 
-<form method="post" action="/">
+<form method="post" action="/login/">
     {{ form.csrf_token }}
     <p>
         {{ form.name.label }}: {{ form.name }}
@@ -17,6 +17,6 @@
 
 <br>
 
-<p><em>Need an account? </em><a href="/register">Signup!!</a></p>
+<p><em>Need an account? </em><a href="/register/">Signup!!</a></p>
 
 {% endblock %}

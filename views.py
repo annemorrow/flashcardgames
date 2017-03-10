@@ -37,7 +37,7 @@ def logout():
     flash('Goodbye!')
     return redirect(url_for('login'))
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     error = None
     form = LoginForm(request.form)
