@@ -14,8 +14,8 @@ app = Flask(__name__)
 app.config.from_object('_config')
 db = SQLAlchemy(app)
 
-from models import Subject, Short_Answer_Question
-from forms import AddSubjectForm
+from models import Subject, Short_Answer_Question, User
+from forms import AddSubjectForm, RegisterForm, LoginForm
 
 # helper functions
 
@@ -49,6 +49,27 @@ def login():
             flash('Welcome!')
             return redirect(url_for('questions'))
     return render_template('login.html')
+
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+    flash("register function called")
+    error = None
+    form = RegisterForm(request.form)
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            flash("form validated")
+            new_user = User(
+                form.name.data,
+                form.email.data,
+                form.password.data
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Thanks for registering. Please login.')
+            return redirect(url_for('login'))
+        else:
+            error = form.errors
+    return render_template('register.html', form=form, error=error)
 
 @app.route('/questions/')
 @login_required
