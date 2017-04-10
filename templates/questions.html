@@ -10,7 +10,6 @@
 
 
 <form action = "{{ url_for('new_question') }}" method="post">
-    <label>List Name:<label>
     <select name="subject_id" width="100px">
         {% for subject in subjects %}
             <option value="{{ subject.id }}">{{ subject.name }}</option>

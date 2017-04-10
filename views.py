@@ -6,12 +6,14 @@ from functools import wraps
 from flask import Flask, flash, redirect, render_template, \
     request, session, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.bcrypt import Bcrypt
     
 
 # config
 
 app = Flask(__name__)
 app.config.from_object('_config')
+bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
 
 from models import Subject, Short_Answer_Question, User
@@ -31,6 +33,10 @@ def login_required(test):
 
 # route handlers
 
+@app.route('/')
+def main():
+    return render_template('main.html')
+
 @app.route('/logout/')
 def logout():
     session.pop('logged_in', None)
@@ -44,7 +50,7 @@ def login():
     if request.method == 'POST':
         if form.validate_on_submit():
             user = User.query.filter_by(name=request.form['name']).first()
-            if user is not None and user.password == request.form['password']:
+            if user is not None and bcrypt.check_password_hash(user.password, request.form['password']):
                 session['logged_in'] = True
                 flash('Welcome!')
                 return redirect(url_for('questions'))
@@ -63,7 +69,7 @@ def register():
             new_user = User(
                 form.name.data,
                 form.email.data,
-                form.password.data
+                bcrypt.generate_password_hash(form.password.data)
             )
             db.session.add(new_user)
             db.session.commit()
