@@ -126,3 +126,7 @@ def delete_question(question_id):
     db.session.commit()
     flash('The question was deleted')
     return redirect(url_for('questions'))
+
+@app.route('/jeopardy/')
+def jeopardy():
+    return render_template('jeopardy.html', js='js/jeopardy.js', css='css/jeopardy.css')

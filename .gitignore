@@ -5,3 +5,4 @@ samples
 __pycache__
 *.DS_Store
 *.ipynb
+jquery-3.2.1.min.js

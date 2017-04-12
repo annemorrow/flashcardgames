@@ -25,7 +25,7 @@
     <h3>{{ subject.name }}</h3>
     <ul>
         {% for question in subject.short_answer_questions %}
-            <li>{{ question.question }} <a href="{{ url_for('delete_question', question_id=question.id) }}">Delete</a></li>
+            <li>{{ question.question }}: {{ question.answer }} <a href="{{ url_for('delete_question', question_id=question.id) }}">Delete</a></li>
         {% endfor %}
     </ul>
 {% endfor %}
